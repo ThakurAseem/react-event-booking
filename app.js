@@ -3,9 +3,22 @@ const bodyParser = require('body-parser');
 const graphqlHttp = require('express-graphql');
 const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
-const Event = require('./models/event');
+
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-yszlp.mongodb.net/${process.env.MONGO_DB}`,{ useNewUrlParser: true });
+const db=mongoose.connection;
+
+db.once('open',()=>{
+  console.log("Connected to the database");
+})
+
+db.on('error',(err)=>{
+  console.log(err);
+})
+
 
 const app = express();
+
+const Event = require('./models/event');
 
 app.use(bodyParser.json());
 
@@ -58,8 +71,7 @@ app.use(
         });
         try {
           const result = await event.save();
-          console.log(result);
-          return { ...result };
+          return { ...result._doc, _id: event.id };
         }
         catch (err) {
           console.log(err);
@@ -71,13 +83,6 @@ app.use(
   })
 );
 
-mongoose
-  .connect('mongodb+srv://ABC:1234@cluster0-yszlp.mongodb.net/test',{ useNewUrlParser: true },{ useUnifiedTopology: true })
-  .then('on',()=>{
-      app.listen(3000,()=>{
-          console.log("This is running..");
-      });
-  })
-  .catch('once',(err)=>{
-      console.log(err);
-  })
+app.listen(3000,()=>{
+  console.log("This is running..");
+});
