@@ -24,7 +24,7 @@ const events = async eventIds => {
         ...event._doc,
         _id: event.id,
         date: new Date(event._doc.date).toISOString(),
-        creator: user.bind(this, event.creator)
+        creator: user.bind(this, event._doc.creator)
       };
     });
     return events;
@@ -114,10 +114,10 @@ app.use(
           date: new Date(args.eventInput.date),
           creator: '5de6ac67aec95648107fb652'
         });
-        let createdEvents;
+        let createdEvent;
         try {
           const result = await event.save();
-          createdEvents = {
+          createdEvent = {
             ...result._doc,
             _id: result._doc._id.toString(),
             date: new Date(event._doc.date).toISOString(),
@@ -131,7 +131,7 @@ app.use(
           creator1.createdEvents.push(event);
           await creator1.save();
     
-          return createdEvents;
+          return createdEvent;
         } catch (err) {
           console.log(err);
           throw err;
